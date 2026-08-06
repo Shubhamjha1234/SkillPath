@@ -70,7 +70,7 @@ export default function ProfilePage() {
         <h2 className="text-lg font-bold text-slate-900 dark:text-white">Active Roadmap</h2>
         <div className="p-4 rounded-xl border border-slate-100 dark:border-zinc-800 bg-slate-50/50 dark:bg-zinc-800/30 flex items-center justify-between">
           <div className="space-y-1">
-            <h3 className="font-bold text-slate-900 dark:text-white">Frontend Development</h3>
+            <h3 className="font-bold text-slate-900 dark:text-white">Technical Learning Path</h3>
             <p className="text-xs text-slate-500">HTML • CSS • JavaScript • Git • React • APIs • Deployment</p>
           </div>
           <span className="text-xs font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950 px-3 py-1 rounded-full">

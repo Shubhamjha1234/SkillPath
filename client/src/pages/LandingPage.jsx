@@ -18,11 +18,11 @@ export default function LandingPage() {
 
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-[1.15]">
             Stop Searching. <br className="hidden sm:inline" />
-            <span className="gradient-text">Start Learning Frontend.</span>
+            <span className="gradient-text">Start Learning Technical Skills.</span>
           </h1>
 
           <p className="text-lg sm:text-xl text-slate-600 dark:text-zinc-400 max-w-2xl mx-auto font-normal leading-relaxed">
-            The best free YouTube tutorials organized into a clear, step-by-step curriculum. 
+            The best free YouTube tutorials organized into clear, step-by-step roadmaps.
             No more tutorial hell — always know exactly what to study next.
           </p>
 
@@ -57,7 +57,7 @@ export default function LandingPage() {
           
           <div className="text-center space-y-3">
             <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-              Frontend Development Roadmap Preview
+              Technical Roadmap Preview
             </h2>
             <p className="text-slate-600 dark:text-zinc-400 text-sm sm:text-base max-w-xl mx-auto">
               7 comprehensive modules, 67 curated video lessons, zero decision paralysis.
@@ -145,9 +145,9 @@ export default function LandingPage() {
       {/* CTA Footer Banner */}
       <section className="py-16 px-4 bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-950 text-white text-center">
         <div className="max-w-3xl mx-auto space-y-6">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Ready to Master Frontend Development?</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Ready to Build Real Technical Skills?</h2>
           <p className="text-indigo-200 text-base max-w-xl mx-auto">
-            Join thousands of beginners building real skills with structured learning paths.
+            Learn through structured roadmaps, curated video lessons, progress tracking, and practical tasks across essential tech disciplines.
           </p>
           <Link
             to="/register"

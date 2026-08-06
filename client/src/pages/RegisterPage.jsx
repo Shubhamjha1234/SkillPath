@@ -43,16 +43,9 @@ export default function RegisterPage() {
             Create your free account
           </h2>
           <p className="text-sm text-slate-500 dark:text-zinc-400">
-            Start your Frontend Development roadmap today
+            Start your technical learning roadmap today
           </p>
         </div>
-
-        {error && (
-          <div className="p-3.5 rounded-xl bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800/50 flex items-center gap-2.5 text-xs text-red-600 dark:text-red-400 font-medium">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{error}</span>
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
