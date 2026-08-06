@@ -1,0 +1,19 @@
+{
+  "name": "skillpath",
+  "version": "1.0.0",
+  "description": "A video-first learning platform organizing free YouTube content into guided roadmaps.",
+  "main": "server/index.js",
+  "scripts": {
+    "setup": "npm install && cd server && npm install && cd ../client && npm install",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "npx concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "seed": "cd server && node seeders/seedFrontendPath.js"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  },
+  "keywords": ["learning-platform", "react", "node", "express", "mongodb", "education"],
+  "author": "",
+  "license": "MIT"
+}
