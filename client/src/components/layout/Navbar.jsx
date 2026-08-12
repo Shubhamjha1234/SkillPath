@@ -1,109 +1,87 @@
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useTheme } from '../../context/ThemeContext';
-import { Compass, LayoutDashboard, Sun, Moon, LogOut, Code, User as UserIcon } from 'lucide-react';
+import { Search, Bell, Settings } from 'lucide-react';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
-  const { isDarkMode, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
 
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-slate-200 dark:border-zinc-800 bg-white/90 dark:bg-[#09090b]/90 backdrop-blur-md transition-colors">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <header className="w-full border-b border-white/5 bg-[#050814]/80 backdrop-blur-md z-50">
+      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         
-        {/* Logo */}
-        <Link to={user ? "/dashboard" : "/"} className="flex items-center gap-2 group">
-          <div className="w-9 h-9 rounded-xl gradient-bg flex items-center justify-center text-white shadow-md group-hover:scale-105 transition-transform">
-            <Code className="w-5 h-5" />
-          </div>
-          <span className="font-bold text-xl tracking-tight font-sans">
-            Skill<span className="gradient-text">Path</span>
-          </span>
-        </Link>
-
-        {/* Desktop Navigation Links */}
-        {user ? (
-          <nav className="hidden md:flex items-center gap-1">
-            <Link
-              to="/dashboard"
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isActive('/dashboard')
-                  ? 'bg-slate-100 dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 font-semibold'
-                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-zinc-800/50'
-              }`}
-            >
-              <LayoutDashboard className="w-4 h-4" />
-              Dashboard
-            </Link>
-            <Link
-              to="/roadmap/frontend-development"
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium transition-colors ${
-                isActive('/roadmap/frontend-development')
-                  ? 'bg-slate-100 dark:bg-zinc-800 text-indigo-600 dark:text-indigo-400 font-semibold'
-                  : 'text-slate-600 dark:text-zinc-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-zinc-800/50'
-              }`}
-            >
-              <Compass className="w-4 h-4" />
-              Roadmap
-            </Link>
-          </nav>
-        ) : null}
+        {/* Navigation Links (Centered) */}
+        <nav className="flex items-center gap-8 mx-auto pl-24">
+          <Link
+            to="/dashboard"
+            className={`text-sm font-medium transition-colors hover:text-white ${
+              isActive('/dashboard') ? 'text-white' : 'text-slate-400'
+            }`}
+          >
+            Dashboard
+          </Link>
+          <Link
+            to="/learning-paths"
+            className={`text-sm font-medium transition-colors hover:text-white ${
+              isActive('/learning-paths') ? 'text-white' : 'text-slate-400'
+            }`}
+          >
+            Learning Paths
+          </Link>
+          <Link
+            to="/roadmap"
+            className={`text-sm font-medium transition-colors hover:text-white ${
+              location.pathname === '/roadmap' || location.pathname === '/roadmap/frontend-development'
+                ? 'text-white'
+                : 'text-slate-400'
+            }`}
+          >
+            Roadmaps
+          </Link>
+          <Link
+            to="/community"
+            className={`text-sm font-medium transition-colors hover:text-white ${
+              isActive('/community') ? 'text-white' : 'text-slate-400'
+            }`}
+          >
+            Community
+          </Link>
+        </nav>
 
         {/* Right side actions */}
-        <div className="flex items-center gap-3">
-          {/* Theme Toggle Button */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 rounded-lg text-slate-500 hover:text-slate-900 dark:text-zinc-400 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-colors"
-            title="Toggle theme"
-          >
-            {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+        <div className="flex items-center gap-6">
+          <button className="text-slate-400 hover:text-white transition-colors">
+            <Search className="w-4.5 h-4.5" />
+          </button>
+          
+          <button className="text-slate-400 hover:text-white transition-colors">
+            <Bell className="w-4.5 h-4.5" />
           </button>
 
-          {user ? (
-            <div className="flex items-center gap-2">
-              <Link
-                to="/profile"
-                className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 dark:border-zinc-800 hover:bg-slate-50 dark:hover:bg-zinc-800 text-sm font-medium transition-colors"
-              >
-                <div className="w-6 h-6 rounded-full bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center text-xs font-bold">
-                  {user.name ? user.name[0].toUpperCase() : 'U'}
-                </div>
-                <span className="hidden sm:inline text-slate-700 dark:text-zinc-300 max-w-[100px] truncate">{user.name}</span>
-              </Link>
+          <button className="text-slate-400 hover:text-white transition-colors">
+            <Settings className="w-4.5 h-4.5" />
+          </button>
 
-              <button
-                onClick={() => {
-                  logout();
-                  navigate('/');
-                }}
-                className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors"
-                title="Logout"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
+          {/* Upgrade Button */}
+          <div className="relative flex flex-col items-center">
+            <button className="bg-violet-300 hover:bg-violet-200 text-[#050814] font-semibold text-xs px-4 py-2 rounded-lg transition-all shadow-[0_0_12px_rgba(167,139,250,0.2)]">
+              Upgrad
+            </button>
+            <span className="absolute -bottom-1.5 w-1 h-1 bg-sky-500 rounded-full" />
+          </div>
+
+          {/* Profile/Avatar */}
+          <Link to="/profile" className="flex items-center">
+            <div className="w-8 h-8 rounded-full border border-white/10 overflow-hidden bg-slate-800 flex items-center justify-center">
+              <span className="text-xs font-semibold text-white">
+                {user?.name ? user.name[0].toUpperCase() : 'U'}
+              </span>
             </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Link
-                to="/login"
-                className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-zinc-300 hover:text-slate-900 dark:hover:text-white transition-colors"
-              >
-                Sign In
-              </Link>
-              <Link
-                to="/register"
-                className="px-4 py-2 text-sm font-semibold text-white gradient-bg rounded-lg shadow-sm transition-all"
-              >
-                Start Learning Free
-              </Link>
-            </div>
-          )}
+          </Link>
         </div>
       </div>
     </header>

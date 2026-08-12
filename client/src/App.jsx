@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { useAuth } from './context/AuthContext';
 
@@ -12,6 +12,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import OnboardingPage from './pages/OnboardingPage';
 import DashboardPage from './pages/DashboardPage';
+import LearningPathsPage from './pages/LearningPathsPage';
 import RoadmapPage from './pages/RoadmapPage';
 import ModulePage from './pages/ModulePage';
 import LessonPage from './pages/LessonPage';
@@ -25,10 +26,13 @@ function ProtectedRoute({ children }) {
 }
 
 export default function App() {
+  const location = useLocation();
+  const isWorkspaceLayout = location.pathname === '/dashboard' || location.pathname === '/learning-paths' || location.pathname === '/profile';
+
   return (
     <div className="flex flex-col min-h-screen pb-16 md:pb-0">
       <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
-      <Navbar />
+      {!isWorkspaceLayout && <Navbar />}
 
       <main className="flex-1">
         <Routes>
@@ -54,6 +58,25 @@ export default function App() {
             }
           />
 
+          <Route
+            path="/learning-paths"
+            element={
+              <ProtectedRoute>
+                <LearningPathsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/community"
+            element={
+              <ProtectedRoute>
+                <LearningPathsPage />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path="/roadmap" element={<Navigate to="/roadmap/frontend-development" replace />} />
           <Route path="/roadmap/frontend-development" element={<RoadmapPage />} />
           <Route path="/module/:id" element={<ModulePage />} />
           <Route path="/lesson/:id" element={<LessonPage />} />
@@ -71,8 +94,8 @@ export default function App() {
         </Routes>
       </main>
 
-      <Footer />
-      <MobileNav />
+      {!isWorkspaceLayout && <Footer />}
+      {!isWorkspaceLayout && <MobileNav />}
     </div>
   );
 }

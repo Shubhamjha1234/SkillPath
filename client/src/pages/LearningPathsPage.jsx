@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import api from '../services/api';
 import { 
   LayoutDashboard, 
   BookOpen, 
@@ -9,33 +8,57 @@ import {
   Award, 
   Settings, 
   Bell,
-  Loader2,
-  User as UserIcon,
-  Mail,
-  Target,
-  Clock
+  Clock,
+  Sparkles,
+  ArrowRight
 } from 'lucide-react';
 
-export default function ProfilePage() {
+export default function LearningPathsPage() {
   const { logout, user } = useAuth();
   const navigate = useNavigate();
-  const [stats, setStats] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [activeCategory, setActiveCategory] = useState('ALL PATHS');
 
-  useEffect(() => {
-    api.get('/dashboard')
-      .then(res => setStats(res.data))
-      .catch(err => console.error(err))
-      .finally(() => setLoading(false));
-  }, []);
+  const categories = [
+    'ALL PATHS',
+    'WEB DEVELOPMENT',
+    'AI / ML',
+    'DATA STRUCTURES',
+    'CLOUD ARCHITECTURE'
+  ];
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#050814] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
-      </div>
-    );
-  }
+  const paths = [
+    {
+      category: 'WEB DEVELOPMENT',
+      title: 'Advanced React Patterns',
+      description: 'Master concurrent mode, custom hooks, and state management at scale.',
+      duration: '12h',
+      difficulty: 'Advanced',
+      difficultyColor: 'text-rose-400',
+      difficultyBars: 3
+    },
+    {
+      category: 'AI / ML',
+      title: 'Neural Networks Intro',
+      description: 'Build your first predictive models using PyTorch and real-world datasets.',
+      duration: '24h',
+      difficulty: 'Beginner',
+      difficultyColor: 'text-emerald-400',
+      difficultyBars: 1
+    },
+    {
+      category: 'DATA STRUCTURES',
+      title: 'Graph Algorithms',
+      description: 'Traversals, shortest paths, and network flows implemented in Python.',
+      duration: '18h',
+      difficulty: 'Intermediate',
+      difficultyColor: 'text-sky-400',
+      difficultyBars: 2
+    }
+  ];
+
+  const filteredPaths = activeCategory === 'ALL PATHS' 
+    ? paths 
+    : paths.filter(p => p.category === activeCategory);
 
   return (
     <div className="min-h-screen bg-[#050814] text-white flex font-sans">
@@ -68,7 +91,7 @@ export default function ProfilePage() {
             
             <button
               onClick={() => navigate('/learning-paths')}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-white/[0.02] transition-all"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium bg-emerald-950/30 text-emerald-400 border border-emerald-500/10 transition-all"
             >
               <BookOpen className="w-5 h-5" />
               Learning Paths
@@ -92,7 +115,7 @@ export default function ProfilePage() {
 
             <button
               onClick={() => navigate('/profile')}
-              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium bg-emerald-950/30 text-emerald-400 border border-emerald-500/10 transition-all"
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-white/[0.02] transition-all"
             >
               <Settings className="w-5 h-5" />
               Settings
@@ -100,7 +123,7 @@ export default function ProfilePage() {
           </nav>
         </div>
 
-        {/* Sidebar Upgrade Button */}
+        {/* Sidebar Footer Upgrade Button */}
         <div>
           <button className="w-full bg-[#1b2034] hover:bg-[#232a45] text-slate-300 border border-white/5 font-medium text-sm py-3 rounded-xl transition-all">
             Upgrade to Pro
@@ -117,9 +140,10 @@ export default function ProfilePage() {
           <nav className="flex items-center gap-8">
             <button 
               onClick={() => navigate('/learning-paths')}
-              className="text-sm font-medium text-slate-400 hover:text-white transition-colors"
+              className="relative text-sm font-medium text-white py-5"
             >
               Paths
+              <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-sky-400 rounded-full" />
             </button>
             <button 
               onClick={() => navigate('/roadmap/frontend-development')}
@@ -165,85 +189,89 @@ export default function ProfilePage() {
           {/* Heading */}
           <div className="relative max-w-4xl space-y-3">
             <h1 className="text-4xl font-bold tracking-tight text-white font-sans">
-              Settings
+              Explore Learning Paths
             </h1>
             <p className="text-slate-400 text-sm font-light leading-relaxed max-w-2xl">
-              Manage your profile, target learning goals, and account details.
+              Master high-performance technical skills with AI-curated curriculum tailored to your pace and goals.
             </p>
           </div>
 
-          {/* Settings Grid */}
-          <div className="max-w-3xl space-y-8 relative">
-            
-            {/* Account Details */}
-            <div className="p-8 rounded-2xl border border-white/5 bg-[#080d1e]/40 space-y-6">
-              <h2 className="text-lg font-bold text-white border-b border-white/5 pb-3">Personal Information</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-                    <UserIcon className="w-3.5 h-3.5" /> Full Name
-                  </label>
-                  <input 
-                    type="text" 
-                    readOnly
-                    value={user?.name || 'Alex Chen'}
-                    className="w-full bg-[#050814]/60 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none text-slate-300"
-                  />
+          {/* Category Tabs */}
+          <div className="relative flex items-center gap-8 border-b border-white/5 pb-3">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setActiveCategory(category)}
+                className={`text-xs font-semibold tracking-wider transition-colors relative pb-3 ${
+                  activeCategory === category ? 'text-white' : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                {category}
+                {activeCategory === category && (
+                  <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-sky-400 rounded-full" />
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* Learning Paths Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+            {filteredPaths.map((path) => (
+              <div 
+                key={path.title}
+                className="rounded-2xl border border-white/5 bg-[#080d1e]/40 hover:bg-[#080d1e]/80 transition-all flex flex-col justify-between overflow-hidden group cursor-pointer"
+              >
+                {/* Header with AI-Powered Badge */}
+                <div className="p-6 pb-4 flex justify-between items-start">
+                  <span className="text-[10px] font-bold tracking-wider text-emerald-400 font-mono">
+                    {path.category}
+                  </span>
+                  
+                  <div className="flex items-center gap-1 bg-[#1d2442]/60 border border-white/5 rounded-lg px-2 py-1 text-[9px] font-medium text-indigo-300 font-mono">
+                    <Sparkles className="w-2.5 h-2.5" />
+                    AI-Powered
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5" /> Email Address
-                  </label>
-                  <input 
-                    type="email" 
-                    readOnly
-                    value={user?.email || 'alex@example.com'}
-                    className="w-full bg-[#050814]/60 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none text-slate-300"
-                  />
+                {/* Body Content */}
+                <div className="px-6 pb-8 space-y-3">
+                  <h3 className="text-lg font-bold text-white group-hover:text-emerald-400 transition-colors">
+                    {path.title}
+                  </h3>
+                  <p className="text-slate-400 text-xs font-light leading-relaxed">
+                    {path.description}
+                  </p>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-                    <Target className="w-3.5 h-3.5" /> Learning Goal
-                  </label>
-                  <input 
-                    type="text" 
-                    readOnly
-                    value={user?.goal ? user.goal.toUpperCase() : 'JOB READY'}
-                    className="w-full bg-[#050814]/60 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none text-slate-300"
-                  />
-                </div>
+                {/* Footer Metadata */}
+                <div className="px-6 py-4 bg-white/[0.01] border-t border-white/5 flex items-center justify-between text-xs text-slate-500">
+                  <div className="flex items-center gap-1.5 font-light">
+                    <Clock className="w-3.5 h-3.5" />
+                    {path.duration}
+                  </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-medium text-slate-400 flex items-center gap-1.5">
-                    <Clock className="w-3.5 h-3.5" /> Time Commitment
-                  </label>
-                  <input 
-                    type="text" 
-                    readOnly
-                    value={user?.time_commitment || '1hr/day'}
-                    className="w-full bg-[#050814]/60 border border-white/10 rounded-xl px-4 py-3 text-sm focus:outline-none text-slate-300"
-                  />
+                  {/* Difficulty Signal Indicator */}
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-end gap-0.5 h-3">
+                      {[1, 2, 3].map((bar) => (
+                        <span 
+                          key={bar} 
+                          className={`w-0.5 rounded-full ${
+                            bar <= path.difficultyBars 
+                              ? path.difficulty === 'Beginner' ? 'bg-emerald-400' : path.difficulty === 'Intermediate' ? 'bg-sky-400' : 'bg-rose-400'
+                              : 'bg-white/10'
+                          }`}
+                          style={{ height: `${bar * 4}px` }}
+                        />
+                      ))}
+                    </div>
+                    <span className={`text-[10px] font-semibold font-mono uppercase ${path.difficultyColor}`}>
+                      {path.difficulty}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-
-            {/* Active Enrolled Path */}
-            <div className="p-8 rounded-2xl border border-white/5 bg-[#080d1e]/40 space-y-4">
-              <h2 className="text-lg font-bold text-white">Active Roadmap</h2>
-              <div className="p-5 rounded-xl border border-emerald-500/10 bg-emerald-950/10 flex items-center justify-between">
-                <div className="space-y-1">
-                  <h3 className="font-bold text-white text-sm">Technical Learning Path</h3>
-                  <p className="text-xs text-slate-400">HTML • CSS • JavaScript • Git • React • APIs • Deployment</p>
-                </div>
-                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-500/15 px-3 py-1 rounded-full uppercase tracking-wider font-mono">
-                  ENROLLED
-                </span>
-              </div>
-            </div>
-
+            ))}
           </div>
         </main>
 
