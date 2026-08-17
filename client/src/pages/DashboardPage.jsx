@@ -1,9 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
-import { Play, Flame, CheckCircle, Clock, ArrowRight, Compass, Sparkles, BookOpen, Loader2 } from 'lucide-react';
+import { 
+  LayoutDashboard, 
+  BookOpen, 
+  Compass, 
+  Award, 
+  Settings, 
+  HelpCircle, 
+  LogOut, 
+  ArrowRight,
+  Loader2 
+} from 'lucide-react';
 
 export default function DashboardPage() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -16,203 +29,180 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-[70vh] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+      <div className="min-h-screen bg-[#050814] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-emerald-400" />
       </div>
     );
   }
 
-  if (!data) {
-    return (
-      <div className="max-w-4xl mx-auto py-12 px-4 text-center space-y-4">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Unable to load dashboard</h2>
-        <p className="text-sm text-slate-500">Please make sure the database is seeded.</p>
-        <Link to="/roadmap/frontend-development" className="inline-block px-4 py-2 gradient-bg text-white rounded-lg text-sm font-semibold">
-          View Roadmap
-        </Link>
-      </div>
-    );
-  }
-
-  const { user, stats, continue_learning, recently_completed, recommended_next } = data;
+  const user = data?.user || { name: 'Alex Chen' };
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
+    <div className="min-h-screen bg-[#050814] text-white flex font-sans">
       
-      {/* Header Greeting */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-            Welcome back, {user.name} 👋
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-zinc-400 mt-1">
-            Track your progress & keep building momentum.
-          </p>
-        </div>
-
-        <Link
-          to="/roadmap/frontend-development"
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-sm font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-50 dark:hover:bg-zinc-800/80 transition-all shadow-xs"
-        >
-          <Compass className="w-4 h-4 text-indigo-600" />
-          View Full Roadmap
-        </Link>
-      </div>
-
-      {/* Hero Continue Learning Card */}
-      {continue_learning ? (
-        <div className="p-6 sm:p-8 rounded-2xl bg-gradient-to-br from-indigo-900 via-indigo-950 to-slate-950 text-white shadow-xl relative overflow-hidden space-y-6">
-          <div className="absolute -right-10 -bottom-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-indigo-300">
-            <Play className="w-3.5 h-3.5 fill-indigo-300" />
-            <span>Continue Where You Left Off</span>
-          </div>
-
-          <div className="space-y-2">
-            <span className="text-xs text-indigo-200 font-medium">Module: {continue_learning.module_title}</span>
-            <h2 className="text-xl sm:text-2xl font-bold">{continue_learning.lesson_title}</h2>
-          </div>
-
-          <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-4 text-xs text-indigo-200">
-              <span className="flex items-center gap-1.5"><Clock className="w-4 h-4" /> ~{continue_learning.duration_minutes} min video</span>
-              <span className="flex items-center gap-1.5"><BookOpen className="w-4 h-4" /> Notes & Takeaways included</span>
-            </div>
-
-            <Link
-              to={`/lesson/${continue_learning.lesson_id}`}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-white text-indigo-950 font-bold hover:bg-indigo-50 shadow-md transition-all group"
-            >
-              Resume Lesson
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-          </div>
-        </div>
-      ) : null}
-
-      {/* Key Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        
-        <div className="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 space-y-3">
-          <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400">
-            <span className="text-xs font-semibold">Overall Progress</span>
-            <Sparkles className="w-4 h-4 text-indigo-500" />
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">{stats.overall_progress}%</span>
-          </div>
-          <div className="w-full h-2 bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500"
-              style={{ width: `${stats.overall_progress}%` }}
-            />
-          </div>
-        </div>
-
-        <div className="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 space-y-3">
-          <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400">
-            <span className="text-xs font-semibold">Current Streak</span>
-            <Flame className="w-4 h-4 text-amber-500 fill-amber-500" />
-          </div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">{stats.current_streak}</span>
-            <span className="text-xs text-slate-500 font-semibold">Days 🔥</span>
-          </div>
-          <p className="text-[11px] text-slate-500 dark:text-zinc-400">Complete 1 lesson daily</p>
-        </div>
-
-        <div className="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 space-y-3">
-          <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400">
-            <span className="text-xs font-semibold">Lessons Done</span>
-            <CheckCircle className="w-4 h-4 text-emerald-500" />
-          </div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">{stats.lessons_completed}</span>
-            <span className="text-xs text-slate-500 font-medium">/ {stats.total_lessons}</span>
-          </div>
-          <p className="text-[11px] text-slate-500 dark:text-zinc-400">Frontend Roadmap</p>
-        </div>
-
-        <div className="p-5 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 space-y-3">
-          <div className="flex items-center justify-between text-slate-500 dark:text-zinc-400">
-            <span className="text-xs font-semibold">Time Spent</span>
-            <Clock className="w-4 h-4 text-blue-500" />
-          </div>
-          <div className="flex items-baseline gap-1">
-            <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">
-              {(stats.time_spent_minutes / 60).toFixed(1)}
+      {/* Sidebar Navigation */}
+      <aside className="w-64 border-r border-white/5 bg-[#050814] flex flex-col justify-between p-6 shrink-0">
+        <div className="space-y-8">
+          {/* Logo / Title */}
+          <div className="px-3">
+            <span className="font-bold text-xl tracking-tight">
+              Skill<span className="text-emerald-400">Path</span>
             </span>
-            <span className="text-xs text-slate-500 font-semibold">Hours</span>
           </div>
-          <p className="text-[11px] text-slate-500 dark:text-zinc-400">Active learning time</p>
-        </div>
 
-      </div>
-
-      {/* Grid for Recently Completed & Recommended Next */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        {/* Recently Completed */}
-        <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 space-y-4">
-          <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <CheckCircle className="w-4 h-4 text-emerald-500" />
-            Recently Completed
-          </h3>
-
-          {recently_completed && recently_completed.length > 0 ? (
-            <div className="space-y-2.5">
-              {recently_completed.map((lesson) => (
-                <Link
-                  key={lesson._id}
-                  to={`/lesson/${lesson._id}`}
-                  className="p-3.5 rounded-xl border border-slate-100 dark:border-zinc-800/80 bg-slate-50/50 dark:bg-zinc-800/30 hover:bg-slate-100 dark:hover:bg-zinc-800/60 flex items-center justify-between transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span className="text-sm font-medium text-slate-800 dark:text-zinc-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
-                      {lesson.title}
-                    </span>
-                  </div>
-                  <span className="text-xs text-slate-400 font-mono">⏱ {lesson.duration_minutes}m</span>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <p className="text-xs text-slate-400 py-4">No completed lessons yet. Start your first lesson!</p>
-          )}
-        </div>
-
-        {/* Recommended Up Next */}
-        <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 space-y-4">
-          <h3 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-amber-500" />
-            Recommended Next Lesson
-          </h3>
-
-          {recommended_next ? (
-            <Link
-              to={`/lesson/${recommended_next._id}`}
-              className="p-4 rounded-xl border border-indigo-200 dark:border-indigo-900/50 bg-indigo-50/40 dark:bg-indigo-950/20 hover:border-indigo-300 block space-y-3 transition-colors group"
+          {/* Navigation Links */}
+          <nav className="space-y-1.5">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-emerald-950/30 text-emerald-400 border border-emerald-500/10"
             >
-              <div className="flex items-center justify-between text-xs text-indigo-600 dark:text-indigo-400 font-medium">
-                <span>NEXT LESSON</span>
-                <span>⏱ {recommended_next.duration_minutes} min</span>
-              </div>
-              <h4 className="font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors">
-                {recommended_next.title}
-              </h4>
-              <div className="flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400">
-                Start Lesson <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </Link>
-          ) : (
-            <p className="text-xs text-slate-400 py-4">You have completed all lessons! 🎉</p>
-          )}
+              <LayoutDashboard className="w-5 h-5" />
+              Dashboard
+            </button>
+            
+            <button
+              onClick={() => navigate('/learning-paths')}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-white/[0.02] transition-all"
+            >
+              <BookOpen className="w-5 h-5" />
+              Learning Paths
+            </button>
+
+            <button
+              onClick={() => navigate('/roadmap/frontend-development')}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-white/[0.02] transition-all"
+            >
+              <Compass className="w-5 h-5" />
+              Roadmap
+            </button>
+
+            <button
+              onClick={() => navigate('/profile')}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-white/[0.02] transition-all"
+            >
+              <Award className="w-5 h-5" />
+              Certificates
+            </button>
+
+            <button
+              onClick={() => navigate('/profile')}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-white/[0.02] transition-all"
+            >
+              <Settings className="w-5 h-5" />
+              Settings
+            </button>
+          </nav>
         </div>
 
-      </div>
+        {/* Sidebar Footer */}
+        <div className="space-y-6">
+          <div className="space-y-1.5">
+            <button className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-200 transition-all">
+              <HelpCircle className="w-5 h-5" />
+              Help Center
+            </button>
 
+            <button
+              onClick={() => {
+                logout();
+                navigate('/');
+              }}
+              className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-red-400 transition-all"
+            >
+              <LogOut className="w-5 h-5" />
+              Logout
+            </button>
+          </div>
+
+          {/* User Profile Card */}
+          <div className="p-3 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl overflow-hidden bg-slate-800 flex items-center justify-center shrink-0">
+              <span className="text-sm font-bold text-white">
+                {user.name ? user.name[0].toUpperCase() : 'U'}
+              </span>
+            </div>
+            <div className="min-w-0">
+              <div className="text-sm font-semibold truncate">{user.name}</div>
+              <div className="text-[11px] text-slate-500 truncate">Pro Plan • 12 Days</div>
+            </div>
+          </div>
+
+          {/* Upgrade Button */}
+          <button className="w-full bg-violet-300 hover:bg-violet-200 text-[#050814] font-semibold text-sm py-3 rounded-xl transition-all shadow-[0_0_12px_rgba(167,139,250,0.2)]">
+            Upgrade to Pro
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <main className="flex-1 bg-grid-lines bg-[#050814] p-12 flex flex-col justify-between relative overflow-y-auto">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(79,70,229,0.06),transparent_40%)] pointer-events-none" />
+
+        <div className="relative max-w-4xl space-y-12">
+          {/* Greeting */}
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
+              Welcome back, {user.name.split(' ')[0]}.
+            </h1>
+            <p className="text-slate-400 text-sm font-light">
+              Here is what you missed since you've been away.
+            </p>
+          </div>
+
+          {/* Current Path Card */}
+          <div className="p-8 rounded-2xl border border-white/5 bg-gradient-to-br from-[#0c142b] via-[#080d1e] to-[#050814] space-y-6">
+            <div className="space-y-1">
+              <span className="text-[10px] font-mono tracking-[0.2em] text-indigo-400 font-semibold uppercase">Current Path</span>
+              <h2 className="text-2xl font-bold">Full-Stack React</h2>
+            </div>
+
+            <p className="text-slate-400 text-sm font-light leading-relaxed max-w-2xl">
+              Master modern React, Server Components, and API integration. You're currently working on state management with Redux Toolkit.
+            </p>
+
+            <div className="space-y-2">
+              <div className="flex justify-between items-center text-xs">
+                <span className="text-slate-500 font-light">Overall Progress</span>
+                <span className="text-emerald-400 font-semibold">75%</span>
+              </div>
+              <div className="w-full h-1.5 bg-white/[0.05] rounded-full overflow-hidden">
+                <div className="h-full bg-emerald-400 rounded-full" style={{ width: '75%' }} />
+              </div>
+            </div>
+          </div>
+
+          {/* Recommended Next Modules */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Card 1 */}
+            <div className="p-6 rounded-2xl border border-white/5 bg-[#080d1e]/40 hover:bg-[#080d1e]/80 transition-all flex justify-between items-center group cursor-pointer">
+              <div className="space-y-1">
+                <h3 className="font-semibold text-sm group-hover:text-emerald-400 transition-colors">Fetching Data in Server Components</h3>
+                <span className="text-[11px] text-slate-500">Next.js Module</span>
+              </div>
+              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:translate-x-1 group-hover:text-emerald-400 transition-all shrink-0 ml-4" />
+            </div>
+
+            {/* Card 2 */}
+            <div className="p-6 rounded-2xl border border-white/5 bg-[#080d1e]/40 hover:bg-[#080d1e]/80 transition-all flex justify-between items-center group cursor-pointer">
+              <div className="space-y-1">
+                <h3 className="font-semibold text-sm group-hover:text-emerald-400 transition-colors">Implementing NextAuth.js</h3>
+                <span className="text-[11px] text-slate-500 font-light">Authentication</span>
+              </div>
+              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:translate-x-1 group-hover:text-emerald-400 transition-all shrink-0 ml-4" />
+            </div>
+          </div>
+        </div>
+
+        {/* Custom Dashboard Footer */}
+        <footer className="mt-16 border-t border-white/5 pt-8 flex items-center justify-end text-xs font-mono tracking-wider text-slate-500">
+          <div className="flex items-center gap-8">
+            <a href="#" className="hover:text-slate-300 transition-colors">Privacy Policy</a>
+            <a href="#" className="hover:text-slate-300 transition-colors">Terms of Service</a>
+            <a href="#" className="hover:text-slate-300 transition-colors">API Docs</a>
+            <a href="#" className="hover:text-slate-300 transition-colors">Contact Support</a>
+          </div>
+        </footer>
+      </main>
     </div>
   );
 }

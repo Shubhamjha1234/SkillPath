@@ -27,7 +27,11 @@ function ProtectedRoute({ children }) {
 
 export default function App() {
   const location = useLocation();
-  const isWorkspaceLayout = location.pathname === '/dashboard' || location.pathname === '/learning-paths' || location.pathname === '/profile';
+  const isWorkspaceLayout =
+    location.pathname === '/dashboard' ||
+    location.pathname === '/learning-paths' ||
+    location.pathname === '/profile' ||
+    location.pathname.startsWith('/roadmap');
 
   return (
     <div className="flex flex-col min-h-screen pb-16 md:pb-0">

@@ -4,13 +4,18 @@
 
 @layer base {
   body {
-    @apply min-h-screen flex flex-col bg-[#FAFAFA] dark:bg-[#09090B] text-slate-900 dark:text-slate-100;
+    @apply min-h-screen flex flex-col bg-[#050814] text-slate-100;
   }
 }
 
 /* Custom Design System Tokens & Animations */
 .glass-panel {
-  @apply bg-white/80 dark:bg-[#18181b]/80 backdrop-blur-md border border-slate-200/80 dark:border-zinc-800/80;
+  @apply bg-[#0b0f19]/80 backdrop-blur-md border border-white/5;
+}
+
+.bg-grid-lines {
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 80px 100%;
 }
 
 .card-hover {
@@ -18,7 +23,7 @@
 }
 
 .gradient-text {
-  @apply bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 bg-clip-text text-transparent;
+  @apply bg-gradient-to-r from-violet-300 via-sky-300 to-emerald-400 bg-clip-text text-transparent;
 }
 
 .gradient-bg {
