@@ -1,2 +1,19 @@
+# Dependencies
 node_modules/
 package-lock.json
+
+# Build outputs (like the 'dist' folder in your client directory)
+dist/
+build/
+
+# Environment variables (like the '.env' file in your server directory)
+.env
+.env.*
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor folders
+.vscode/
+.idea/
