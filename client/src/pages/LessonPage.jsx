@@ -1,8 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import { CheckCircle2, ArrowRight, ArrowLeft, ExternalLink, Lightbulb, Code2, BookOpen, Loader2, Sparkles, Circle } from 'lucide-react';
+import { CheckCircle2, ArrowRight, ArrowLeft, ExternalLink, Lightbulb, Code2, BookOpen, Loader2, Sparkles, Circle, Menu } from 'lucide-react';
 import toast from 'react-hot-toast';
+import AIVideoSection from '../components/learning/AIVideoSection';
+import CommandSection from '../components/learning/CommandSection';
+import CourseSidebar from '../components/learning/CourseSidebar';
+import BuildChallenge from '../components/learning/BuildChallenge';
 
 export default function LessonPage() {
   const { id } = useParams();
@@ -13,14 +17,24 @@ export default function LessonPage() {
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(false);
 
+  const [userProgress, setUserProgress] = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [challengeCompleted, setChallengeCompleted] = useState(false);
+
+  useEffect(() => {
+    setChallengeCompleted(false);
+  }, [id]);
+
   useEffect(() => {
     setLoading(true);
     api.get(`/lessons/${id}`)
       .then(res => {
         setLessonData(res.data);
-        // Check progress
-        api.get(`/modules/${res.data.module._id}/progress`)
+        const pathSlug = res.data.path_slug || 'frontend-development';
+        // Fetch path progress dynamically
+        api.get(`/paths/${pathSlug}/progress`)
           .then(progRes => {
+            setUserProgress(progRes.data);
             const completed = progRes.data.completed_lesson_ids.includes(id);
             setIsCompleted(completed);
           })
@@ -33,6 +47,7 @@ export default function LessonPage() {
   const handleToggleComplete = async () => {
     setCompleting(true);
     try {
+      const pathSlug = lessonData.path_slug || 'frontend-development';
       if (isCompleted) {
         await api.delete(`/lessons/${id}/complete`);
         setIsCompleted(false);
@@ -42,10 +57,25 @@ export default function LessonPage() {
         setIsCompleted(true);
         toast.success(`🎉 Lesson completed! Streak: ${res.data.streak} Days 🔥`);
       }
+      
+      const progRes = await api.get(`/paths/${pathSlug}/progress`);
+      setUserProgress(progRes.data);
     } catch (err) {
       toast.error('Failed to update lesson completion state');
     } finally {
       setCompleting(false);
+    }
+  };
+
+  const handleChallengeComplete = async () => {
+    if (challengeCompleted) {
+      toast.success('Challenge already completed!');
+      return;
+    }
+    setChallengeCompleted(true);
+    toast.success('🚀 Build Challenge Completed Successfully!');
+    if (!isCompleted) {
+      await handleToggleComplete();
     }
   };
 
@@ -59,66 +89,114 @@ export default function LessonPage() {
 
   if (!lessonData) return null;
 
-  const { lesson, module, siblings, prev_lesson, next_lesson } = lessonData;
+  const { lesson, module, siblings, prev_lesson, next_lesson, modules } = lessonData;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-6 space-y-6">
-      
-      {/* Breadcrumb Navigation */}
-      <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-zinc-400 font-medium">
-        <Link to="/roadmap/frontend-development" className="hover:text-indigo-600">Frontend</Link>
-        <span>/</span>
-        <Link to={`/module/${module._id}`} className="hover:text-indigo-600 truncate max-w-[150px]">{module.title}</Link>
-        <span>/</span>
-        <span className="text-slate-900 dark:text-white font-semibold truncate">{lesson.title}</span>
-      </div>
+    <div className="min-h-screen bg-[#050814] flex text-white font-sans">
+      {/* Course Left Sidebar */}
+      <CourseSidebar
+        modules={modules}
+        currentLessonId={id}
+        completedLessonIds={userProgress?.completed_lesson_ids || []}
+        progress={userProgress}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        
-        {/* Main Content Area (3 cols) */}
-        <div className="lg:col-span-3 space-y-6">
+      {/* Main Content Pane */}
+      <div className="flex-1 min-w-0 flex flex-col">
+        {/* Mobile Header / Sidebar Toggle */}
+        <div className="lg:hidden flex items-center justify-between p-4 border-b border-white/5 bg-[#050814] shrink-0 sticky top-0 z-30">
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+          >
+            <Menu className="w-5 h-5 text-emerald-400" />
+            <span>Curriculum Outline</span>
+          </button>
           
-          {/* Lesson Header */}
+          <div className="flex items-center gap-2 text-xs text-emerald-400 font-mono">
+            <span>{userProgress?.percentage || 0}% Complete</span>
+          </div>
+        </div>
+
+        {/* Lesson Content Area */}
+        <div className="flex-1 overflow-y-auto px-6 py-8 md:px-12 max-w-4xl w-full mx-auto space-y-8">
+          
+          {/* Breadcrumb Navigation */}
+          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-zinc-400 font-medium">
+            <Link to={`/roadmap/${lessonData.path_slug || 'frontend-development'}`} className="hover:text-indigo-600">
+              {lessonData.path_title || 'Roadmap'}
+            </Link>
+            <span>/</span>
+            <span className="truncate max-w-[150px]">{module.title}</span>
+            <span>/</span>
+            <span className="text-slate-900 dark:text-white font-semibold truncate">{lesson.title}</span>
+          </div>
+
+          {/* Lesson Header: Title, Duration */}
           <div className="space-y-2">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-950 dark:text-white tracking-tight animate-fade-in">
               {lesson.title}
             </h1>
-            <p className="text-xs text-slate-500 font-mono">⏱ ~{lesson.duration_minutes} minutes watch time</p>
+            <div className="flex items-center gap-4 text-xs text-slate-500 font-mono">
+              <span>⏱ ~{lesson.duration_minutes} minutes watch time</span>
+              {lesson.build_challenge && (
+                <span className="text-emerald-400">⚡ Build Challenge Included</span>
+              )}
+            </div>
           </div>
 
-          {/* Embedded YouTube Player */}
-          <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-xl border border-slate-200 dark:border-zinc-800">
-            <iframe
-              className="w-full h-full"
-              src={`https://www.youtube-nocookie.com/embed/${lesson.youtube_id}?rel=0&modestbranding=1`}
-              title={lesson.title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
+          {/* AI Video section */}
+          <AIVideoSection aiVideoUrl={lesson.ai_video_url} />
 
-          {/* About This Lesson */}
+          {/* Embedded YouTube Player (Preserved as fallback) */}
+          {lesson.youtube_id && (
+            <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black shadow-xl border border-slate-200 dark:border-zinc-800">
+              <iframe
+                className="w-full h-full"
+                src={`https://www.youtube-nocookie.com/embed/${lesson.youtube_id}?rel=0&modestbranding=1`}
+                title={lesson.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          )}
+
+          {/* About This Topic */}
           <div className="p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 space-y-3">
             <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
               <BookOpen className="w-4 h-4 text-indigo-600" />
-              About This Lesson
+              About This Topic
             </h2>
-            <p className="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed">
+            <p className="text-sm text-slate-600 dark:text-zinc-400 leading-relaxed font-light">
               {lesson.description}
             </p>
           </div>
 
+          {/* Command Section */}
+          {lesson.command && <CommandSection command={lesson.command} />}
+
+          {/* Learn by Building Challenge */}
+          {lesson.build_challenge && (
+            <BuildChallenge
+              challenge={lesson.build_challenge}
+              onComplete={handleChallengeComplete}
+              isCompleted={challengeCompleted || isCompleted}
+            />
+          )}
+
           {/* Key Takeaways */}
           {lesson.key_takeaways && lesson.key_takeaways.length > 0 && (
-            <div className="p-6 rounded-2xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40 space-y-4">
+            <div className="p-6 rounded-2xl bg-white dark:bg-white/[0.03] border border-slate-200 dark:border-white/10 backdrop-blur-md space-y-4 shadow-sm">
               <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-                <Lightbulb className="w-4 h-4 text-amber-500" />
+                <Lightbulb className="w-4 h-4 text-amber-400 fill-amber-400/25" />
                 Key Takeaways
               </h2>
               <ul className="space-y-2.5">
                 {lesson.key_takeaways.map((point, idx) => (
-                  <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-700 dark:text-zinc-300">
-                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 mt-2 shrink-0" />
+                  <li key={idx} className="flex items-start gap-2.5 text-sm text-slate-700 dark:text-slate-200 leading-relaxed font-light">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 dark:bg-indigo-400 mt-2 shrink-0 animate-pulse" />
                     <span>{point}</span>
                   </li>
                 ))}
@@ -168,22 +246,22 @@ export default function LessonPage() {
             </div>
           )}
 
-          {/* Bottom Actions Bar */}
-          <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-4 shadow-lg z-30">
+          {/* Bottom Navigation & Actions Bar */}
+          <div className="p-4 rounded-2xl bg-[#070b1a] border border-slate-800/60 flex flex-col sm:flex-row items-center justify-between gap-4 sticky bottom-4 shadow-2xl z-30">
             <button
               onClick={handleToggleComplete}
               disabled={completing}
               className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
                 isCompleted
-                  ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800'
-                  : 'gradient-bg text-white shadow-md hover:scale-[1.02]'
+                  ? 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/30'
+                  : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-md hover:scale-[1.02]'
               }`}
             >
               {completing ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : isCompleted ? (
                 <>
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 fill-emerald-100 dark:fill-emerald-900" />
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 fill-emerald-500/10" />
                   Completed ✓
                 </>
               ) : (
@@ -198,7 +276,7 @@ export default function LessonPage() {
               {prev_lesson && (
                 <Link
                   to={`/lesson/${prev_lesson._id}`}
-                  className="flex-1 sm:flex-none px-4 py-3 rounded-xl border border-slate-200 dark:border-zinc-800 text-xs font-semibold text-slate-700 dark:text-zinc-300 hover:bg-slate-50 flex items-center justify-center gap-1.5"
+                  className="flex-1 sm:flex-none px-4 py-3 rounded-xl border border-slate-800 text-xs font-semibold text-slate-400 hover:text-white hover:bg-white/5 flex items-center justify-center gap-1.5"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" /> Prev
                 </Link>
@@ -206,7 +284,7 @@ export default function LessonPage() {
               {next_lesson && (
                 <Link
                   to={`/lesson/${next_lesson._id}`}
-                  className="flex-1 sm:flex-none px-5 py-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-xs font-bold hover:opacity-90 flex items-center justify-center gap-1.5 shadow-sm"
+                  className="flex-1 sm:flex-none px-5 py-3 rounded-xl bg-indigo-600 text-white text-xs font-bold hover:bg-indigo-500 flex items-center justify-center gap-1.5 shadow-sm"
                 >
                   Next Lesson <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
@@ -215,38 +293,7 @@ export default function LessonPage() {
           </div>
 
         </div>
-
-        {/* Sidebar: Module Lessons List (Desktop) */}
-        <div className="hidden lg:block lg:col-span-1 space-y-4">
-          <div className="p-4 rounded-2xl bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 space-y-3 sticky top-20">
-            <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
-              {module.title}
-            </h3>
-
-            <div className="space-y-1.5 max-h-[70vh] overflow-y-auto pr-1">
-              {siblings && siblings.map((sib, idx) => {
-                const isCurrent = sib._id.toString() === lesson._id.toString();
-
-                return (
-                  <Link
-                    key={sib._id}
-                    to={`/lesson/${sib._id}`}
-                    className={`p-2.5 rounded-xl text-xs font-medium block truncate transition-colors ${
-                      isCurrent
-                        ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold border border-indigo-200 dark:border-indigo-900/50'
-                        : 'text-slate-600 dark:text-zinc-400 hover:bg-slate-50 dark:hover:bg-zinc-800/50'
-                    }`}
-                  >
-                    {idx + 1}. {sib.title}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
       </div>
-
     </div>
   );
 }

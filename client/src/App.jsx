@@ -14,7 +14,6 @@ import OnboardingPage from './pages/OnboardingPage';
 import DashboardPage from './pages/DashboardPage';
 import LearningPathsPage from './pages/LearningPathsPage';
 import RoadmapPage from './pages/RoadmapPage';
-import ModulePage from './pages/ModulePage';
 import LessonPage from './pages/LessonPage';
 import ProfilePage from './pages/ProfilePage';
 
@@ -81,8 +80,7 @@ export default function App() {
           />
 
           <Route path="/roadmap" element={<Navigate to="/roadmap/frontend-development" replace />} />
-          <Route path="/roadmap/frontend-development" element={<RoadmapPage />} />
-          <Route path="/module/:id" element={<ModulePage />} />
+          <Route path="/roadmap/:slug" element={<RoadmapPage />} />
           <Route path="/lesson/:id" element={<LessonPage />} />
 
           <Route

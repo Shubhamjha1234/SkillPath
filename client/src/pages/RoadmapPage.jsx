@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { ArrowRight, Compass, Loader2, LayoutDashboard, BookOpen, Award, Settings } from 'lucide-react';
@@ -7,14 +7,16 @@ import { ArrowRight, Compass, Loader2, LayoutDashboard, BookOpen, Award, Setting
 export default function RoadmapPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { slug = 'frontend-development' } = useParams();
   const [pathData, setPathData] = useState(null);
   const [userProgress, setUserProgress] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setLoading(true);
     Promise.all([
-      api.get('/paths/frontend-development'),
-      api.get('/paths/frontend-development/progress')
+      api.get(`/paths/${slug}`),
+      api.get(`/paths/${slug}/progress`)
     ])
       .then(([pathRes, progRes]) => {
         setPathData(pathRes.data);
@@ -22,7 +24,7 @@ export default function RoadmapPage() {
       })
       .catch(err => console.error(err))
       .finally(() => setLoading(false));
-  }, []);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -34,9 +36,9 @@ export default function RoadmapPage() {
 
   if (!pathData) return null;
 
-  const { path } = pathData;
+  const { path, modules } = pathData;
   const progressPercentage = userProgress?.percentage || 0;
-  const completedIds = userProgress?.completedLessonIds || [];
+  const completedIds = userProgress?.completed_lesson_ids || userProgress?.completedLessonIds || [];
 
   return (
     <div className='min-h-screen bg-slate-950 text-slate-100 flex'>
@@ -60,7 +62,7 @@ export default function RoadmapPage() {
               <BookOpen className='w-5 h-5' />
               Learning Paths
             </button>
-            <button onClick={() => navigate('/roadmap/frontend-development')} className='w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium bg-emerald-950/30 text-emerald-400 border border-emerald-500/10 transition-all'>
+            <button onClick={() => navigate(`/roadmap/${slug}`)} className='w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium bg-emerald-950/30 text-emerald-400 border border-emerald-500/10 transition-all'>
               <Compass className='w-5 h-5' />
               Roadmap
             </button>
@@ -104,12 +106,12 @@ export default function RoadmapPage() {
           </section>
 
           {/* Modules List */}
-          {path.modules && path.modules.length > 0 && (
+          {modules && modules.length > 0 && (
             <section className='space-y-6'>
               <h2 className='text-2xl font-bold text-white'>Modules</h2>
               <div className='grid gap-6 md:grid-cols-2'>
-                {path.modules.map((mod, index) => (
-                  <div key={mod.id || index} className='glass-panel p-6 rounded-2xl border border-white/5 hover:border-emerald-500/30 transition-all'>
+                {modules.map((mod, index) => (
+                  <div key={mod._id || mod.id || index} className='glass-panel p-6 rounded-2xl border border-white/5 hover:border-emerald-500/30 transition-all'>
                     <div className='flex items-center justify-between mb-3'>
                       <span className='text-xs font-semibold text-emerald-400 uppercase tracking-widest'>Module {index + 1}</span>
                       {mod.duration && <span className='text-xs text-slate-400'>{mod.duration}</span>}
@@ -117,10 +119,10 @@ export default function RoadmapPage() {
                     <h3 className='text-xl font-bold text-white mb-2'>{mod.title}</h3>
                     <p className='text-sm text-slate-400 mb-6 line-clamp-2'>{mod.description}</p>
                     <Link
-                      to={`/module/${mod.id}`}
+                      to={mod.lessons && mod.lessons.length > 0 ? `/lesson/${mod.lessons[0]._id || mod.lessons[0].id}` : '#'}
                       className='inline-flex items-center gap-2 text-sm font-semibold text-emerald-400 hover:text-emerald-300 transition-colors'
                     >
-                      View Module <ArrowRight className='w-4 h-4' />
+                      Start Module <ArrowRight className='w-4 h-4' />
                     </Link>
                   </div>
                 ))}

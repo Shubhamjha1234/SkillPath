@@ -40,11 +40,11 @@ export default function ModulePage() {
       
       {/* Back link */}
       <Link
-        to="/roadmap/frontend-development"
+        to={`/roadmap/${data.path_slug || 'frontend-development'}`}
         className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-indigo-600 dark:text-zinc-400 dark:hover:text-indigo-400 transition-colors"
       >
         <ArrowLeft className="w-3.5 h-3.5" />
-        Back to Frontend Roadmap
+        Back to Roadmap
       </Link>
 
       {/* Module Header */}
