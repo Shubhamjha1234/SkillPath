@@ -3,6 +3,7 @@ const router = express.Router();
 const Module = require('../models/Module');
 const Lesson = require('../models/Lesson');
 const Progress = require('../models/Progress');
+const Path = require('../models/Path');
 const { protect } = require('../middleware/authMiddleware');
 const mockData = require('../data/mockData');
 
@@ -13,14 +14,19 @@ router.get('/:id', async (req, res) => {
       const module = mockData.mockModules.find(m => m._id === req.params.id);
       if (!module) return res.status(404).json({ error: 'Module not found' });
       const lessons = mockData.mockLessons.filter(l => l.module_id === module._id);
-      return res.json({ module, lessons });
+      const path = mockData.mockPaths.find(p => p._id === module.path_id);
+      const path_slug = path ? path.slug : 'frontend-development';
+      return res.json({ module, lessons, path_slug });
     }
 
     const module = await Module.findById(req.params.id);
     if (!module) return res.status(404).json({ error: 'Module not found' });
 
+    const path = await Path.findById(module.path_id);
+    const path_slug = path ? path.slug : 'frontend-development';
+
     const lessons = await Lesson.find({ module_id: module._id }).sort({ order: 1 });
-    res.json({ module, lessons });
+    res.json({ module, lessons, path_slug });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

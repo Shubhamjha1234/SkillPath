@@ -11,7 +11,7 @@ const mockData = require('../data/mockData');
 router.get('/', async (req, res) => {
   try {
     if (mockData.isInMemory) {
-      return res.json([mockData.mockPath]);
+      return res.json(mockData.mockPaths);
     }
     const paths = await Path.find({ is_published: true });
     res.json(paths);
@@ -24,11 +24,14 @@ router.get('/', async (req, res) => {
 router.get('/:slug', async (req, res) => {
   try {
     if (mockData.isInMemory) {
-      const path = mockData.mockPath;
-      const modules = mockData.mockModules.map(mod => ({
-        ...mod,
-        lessons: mockData.mockLessons.filter(l => l.module_id === mod._id)
-      }));
+      const path = mockData.mockPaths.find(p => p.slug === req.params.slug);
+      if (!path) return res.status(404).json({ error: 'Learning path not found' });
+      const modules = mockData.mockModules
+        .filter(mod => mod.path_id === path._id)
+        .map(mod => ({
+          ...mod,
+          lessons: mockData.mockLessons.filter(l => l.module_id === mod._id)
+        }));
       return res.json({ path, modules });
     }
 
@@ -54,13 +57,16 @@ router.get('/:slug', async (req, res) => {
 router.get('/:slug/progress', protect, async (req, res) => {
   try {
     if (mockData.isInMemory) {
-      const userProg = mockData.mockProgress.filter(p => p.user_id.toString() === req.user._id.toString() && p.is_completed);
+      const path = mockData.mockPaths.find(p => p.slug === req.params.slug);
+      if (!path) return res.status(404).json({ error: 'Learning path not found' });
+      const userProg = mockData.mockProgress.filter(p => p.user_id.toString() === req.user._id.toString() && p.path_id === path._id && p.is_completed);
       const completedIds = userProg.map(p => p.lesson_id);
+      const totalLessons = path.total_lessons || 1;
       return res.json({
-        path_id: mockData.mockPath._id,
-        total_lessons: 67,
+        path_id: path._id,
+        total_lessons: totalLessons,
         completed_lessons_count: completedIds.length,
-        percentage: Math.round((completedIds.length / 67) * 100),
+        percentage: Math.round((completedIds.length / totalLessons) * 100),
         completed_lesson_ids: completedIds
       });
     }

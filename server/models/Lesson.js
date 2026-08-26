@@ -23,7 +23,29 @@ const lessonSchema = new mongoose.Schema({
     question: { type: String },
     options: [{ type: String }],
     answer_index: { type: Number }
-  }]
+  }],
+  command: {
+    code: { type: String },
+    description: { type: String },
+    usage: { type: String },
+    steps: [{ type: String }]
+  },
+  build_challenge: {
+    title: { type: String },
+    description: { type: String },
+    difficulty: { type: String },
+    estimated_time: { type: String },
+    skills: [{ type: String }],
+    requirements: [{ type: String }],
+    starter_code: { type: String },
+    expected_behavior: { type: String },
+    hints: [{ type: String }],
+    solution_explanation: { type: String }
+  },
+  ai_video_url: {
+    type: String,
+    default: null
+  }
 }, { timestamps: true });
 
 lessonSchema.index({ module_id: 1, order: 1 });

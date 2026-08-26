@@ -30,6 +30,7 @@ export default function LearningPathsPage() {
     {
       category: 'WEB DEVELOPMENT',
       title: 'Advanced React Patterns',
+      slug: 'advanced-react-patterns',
       description: 'Master concurrent mode, custom hooks, and state management at scale.',
       duration: '12h',
       difficulty: 'Advanced',
@@ -39,6 +40,7 @@ export default function LearningPathsPage() {
     {
       category: 'AI / ML',
       title: 'Neural Networks Intro',
+      slug: 'neural-networks-intro',
       description: 'Build your first predictive models using PyTorch and real-world datasets.',
       duration: '24h',
       difficulty: 'Beginner',
@@ -48,6 +50,7 @@ export default function LearningPathsPage() {
     {
       category: 'DATA STRUCTURES',
       title: 'Graph Algorithms',
+      slug: 'graph-algorithms',
       description: 'Traversals, shortest paths, and network flows implemented in Python.',
       duration: '18h',
       difficulty: 'Intermediate',
@@ -219,6 +222,7 @@ export default function LearningPathsPage() {
             {filteredPaths.map((path) => (
               <div 
                 key={path.title}
+                onClick={() => navigate(`/roadmap/${path.slug}`)}
                 className="rounded-2xl border border-white/5 bg-[#080d1e]/40 hover:bg-[#080d1e]/80 transition-all flex flex-col justify-between overflow-hidden group cursor-pointer"
               >
                 {/* Header with AI-Powered Badge */}

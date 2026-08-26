@@ -15,7 +15,7 @@ let mockUsers = [
   }
 ];
 
-let mockPath = null;
+let mockPaths = [];
 let mockModules = [];
 let mockLessons = [];
 let mockProgress = [];
@@ -27,11 +27,14 @@ let mockStreaks = [{
   activity_dates: [new Date().toISOString().split('T')[0]]
 }];
 
+const extraPaths = require('./extraCoursesData');
+
 function initInMemoryDB() {
   isInMemoryMode = true;
-  console.log('⚡ Initializing SkillPath In-Memory Data Store (67 Lessons)...');
+  console.log('⚡ Initializing SkillPath In-Memory Data Store (All Paths Loaded)...');
 
-  mockPath = {
+  // Load Frontend Development Path
+  const mainPath = {
     _id: 'path-frontend-123',
     title: 'Frontend Development',
     slug: 'frontend-development',
@@ -42,6 +45,7 @@ function initInMemoryDB() {
     is_published: true
   };
 
+  mockPaths = [mainPath];
   mockModules = [];
   mockLessons = [];
 
@@ -51,7 +55,7 @@ function initInMemoryDB() {
 
     mockModules.push({
       _id: modId,
-      path_id: mockPath._id,
+      path_id: mainPath._id,
       ...modInfo
     });
 
@@ -64,14 +68,33 @@ function initInMemoryDB() {
     });
   });
 
-  console.log(`✅ In-Memory Data Store initialized with ${mockLessons.length} lessons across ${mockModules.length} modules!`);
+  // Load Extra Paths (React patterns, Neural networks, Graph algorithms)
+  extraPaths.forEach((extra) => {
+    mockPaths.push(extra.path);
+    extra.modules.forEach((mod) => {
+      const { lessons, ...modInfo } = mod;
+      mockModules.push({
+        ...modInfo,
+        path_id: extra.path._id
+      });
+      lessons.forEach((les) => {
+        mockLessons.push({
+          ...les,
+          module_id: mod._id
+        });
+      });
+    });
+  });
+
+  console.log(`✅ In-Memory Data Store initialized with ${mockPaths.length} paths, ${mockModules.length} modules, and ${mockLessons.length} lessons!`);
 }
 
 module.exports = {
   get isInMemory() { return isInMemoryMode; },
   initInMemoryDB,
   mockUsers,
-  get mockPath() { return mockPath; },
+  get mockPath() { return mockPaths[0]; },
+  get mockPaths() { return mockPaths; },
   mockModules,
   mockLessons,
   mockProgress,
