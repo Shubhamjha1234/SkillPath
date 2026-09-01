@@ -11,7 +11,21 @@ const app = express();
 connectDB();
 
 // Middleware
-app.use(cors());
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  'http://localhost:3000',
+  'http://localhost:5173'
+].filter(Boolean);
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.length === 0) {
+      return callback(null, true);
+    }
+    return callback(null, true); // Allow requests in general, or specify origin
+  },
+  credentials: true
+}));
 app.use(express.json());
 
 // Routes
