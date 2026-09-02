@@ -33,14 +33,14 @@ app.get('/', (req, res) => {
 });
 
 // Routes
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/paths', require('./routes/pathRoutes'));
-app.use('/api/modules', require('./routes/moduleRoutes'));
-app.use('/api/lessons', require('./routes/lessonRoutes'));
-app.use('/api/dashboard', require('./routes/dashboardRoutes'));
+app.use('/auth', require('./routes/authRoutes'));
+app.use('/paths', require('./routes/pathRoutes'));
+app.use('/modules', require('./routes/moduleRoutes'));
+app.use('/lessons', require('./routes/lessonRoutes'));
+app.use('/dashboard', require('./routes/dashboardRoutes'));
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
+app.get('/health', (req, res) => {
   res.json({ status: 'ok', app: 'SkillPath API', timestamp: new Date() });
 });
 
