@@ -20,11 +20,11 @@ export default function LandingPage() {
                 Curated Technical Learning Paths
               </div>
 
-              <h1 className="mt-8 text-5xl font-extrabold tracking-tight text-white sm:text-6xl lg:text-7xl leading-[1.1]">
+              <h1 className="mt-8 text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-7xl leading-[1.1]">
                 From scattered tutorials to a <span className="gradient-text">clear, mastery-driven</span> roadmap.
               </h1>
 
-              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-slate-400 sm:text-xl">
+              <p className="mt-6 max-w-2xl text-base leading-relaxed text-slate-400 sm:text-xl">
                 A video-first, structured platform built for ambitious developers who want speed, clarity, and true engineering competence.
               </p>
 
@@ -46,16 +46,16 @@ export default function LandingPage() {
             </div>
 
             {/* Feature Highlight Box */}
-            <div className="w-full max-w-5xl mt-8 rounded-3xl glass-panel p-8 sm:p-10 shadow-2xl relative overflow-hidden border border-white/10">
+            <div className="w-full max-w-5xl mt-8 rounded-2xl glass-panel p-5 sm:p-8 lg:p-10 shadow-2xl relative overflow-hidden border border-white/10">
               <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/10 blur-[90px] pointer-events-none rounded-full" />
               
-              <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-center text-left">
+              <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] items-center text-left">
                 <div className="space-y-4">
                   <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.25em] text-indigo-400">
                     <Compass className="h-4 w-4 text-indigo-400" />
                     Structured Learning System
                   </span>
-                  <h2 className="text-3xl font-bold text-white sm:text-4xl">
+                  <h2 className="text-2xl font-bold text-white sm:text-3xl">
                     Designed for momentum and real technical progress.
                   </h2>
                   <p className="text-base leading-relaxed text-slate-400">
@@ -86,7 +86,7 @@ export default function LandingPage() {
           <div className="mx-auto max-w-6xl">
             <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
               <span className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-400">Why SkillPath</span>
-              <h2 className="text-3xl font-bold text-white sm:text-4xl">Everything you need to master your stack</h2>
+              <h2 className="text-2xl font-bold text-white sm:text-3xl">Everything you need to master your stack</h2>
             </div>
 
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -132,7 +132,7 @@ export default function LandingPage() {
               Ready to Accelerate?
             </div>
             
-            <h2 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+            <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
               Start building real technical skills today.
             </h2>
             

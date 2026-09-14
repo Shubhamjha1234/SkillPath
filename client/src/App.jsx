@@ -30,10 +30,11 @@ export default function App() {
     location.pathname === '/dashboard' ||
     location.pathname === '/learning-paths' ||
     location.pathname === '/profile' ||
-    location.pathname.startsWith('/roadmap');
+    location.pathname.startsWith('/roadmap') ||
+    location.pathname.startsWith('/lesson');
 
   return (
-    <div className="flex flex-col min-h-screen pb-16 md:pb-0">
+    <div className="flex flex-col min-h-screen">
       <Toaster position="top-right" toastOptions={{ duration: 3000 }} />
       {!isWorkspaceLayout && <Navbar />}
 
